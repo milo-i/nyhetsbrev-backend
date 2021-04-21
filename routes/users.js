@@ -8,6 +8,7 @@ const User = require('../models/user');
 const randomKey = require('random-key');
 const CryptoJS = require('crypto-js');
 const { db } = require('../models/user');
+const { log } = require('debug');
 
 
 
@@ -19,21 +20,20 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
+router.get('/', (req, res, next) => {
 
 
 
   res.send('Hello users');
 });
 
-router.post('/new', function (req, res, next) {
-  console.log(req.body);
+router.post('/new', (req, res, next) => {
 
   User.find({ userName: req.body.userEmail })
     .exec()
     .then(user => {
       if (user.length >= 1) {
-        res.json({
+        res.status(422).json({
           message: "Användare existerar redan"
         });
       } else {
@@ -55,8 +55,42 @@ router.post('/new', function (req, res, next) {
           .catch((err) => { console.log(err) })
       }
     })
-    .catch()
+    .catch((err) => console.log(err));
 
 });
+
+
+router.post('/login', (req, res, next) => {
+  User.find({ userName: req.body.userEmail })
+    .exec()
+    .then(user => {
+      // console.log(userName);
+      // console.log(req.body.userEmail);
+
+      if (user.length < 1) {
+        res.json({
+          message: 'Fel användarnamn eller lösenord ifyllt'
+        });
+      }
+      let originalPass = CryptoJS.AES.decrypt(user[0].userPassword, 'SecretKey123').toString(CryptoJS.enc.Utf8);
+      if (originalPass == req.body.userInputPassword) {
+        // res.json(user[0].id)
+        res.json('det lyckades')
+      } else {
+        res.json({
+          message: 'Fel användarnamn eller lösenord IFYLLT'
+        });
+      }
+
+
+
+    })
+    .catch(err => {
+      console.log(err);
+      res.json('error');
+    })
+
+});
+
 
 module.exports = router;
