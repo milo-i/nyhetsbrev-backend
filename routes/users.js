@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const randomKey = require('random-key');
 const CryptoJS = require('crypto-js');
+const { db } = require('../models/user');
 
 
 
@@ -20,27 +21,41 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 /* GET users listing. */
 router.get('/', function (req, res, next) {
 
+
+
   res.send('Hello users');
 });
 
 router.post('/new', function (req, res, next) {
   console.log(req.body);
 
-  let userPass = req.body.userPassword;
-  let encryptPass = CryptoJS.AES.encrypt(userPass, 'SecretKey123').toString();
+  User.find({ userName: req.body.userEmail })
+    .exec()
+    .then(user => {
+      if (user.length >= 1) {
+        res.json({
+          message: "Användare existerar redan"
+        });
+      } else {
+        let userPass = req.body.userPassword;
+        let encryptPass = CryptoJS.AES.encrypt(userPass, 'SecretKey123').toString();
 
-  const user = new User({
-    id: randomKey.generate(),
-    userName: req.body.userEmail,
-    userPassword: encryptPass,
-    subscription: req.body.subscription
-  });
+        const user = new User({
+          id: randomKey.generate(),
+          userName: req.body.userEmail,
+          userPassword: encryptPass,
+          subscription: req.body.subscription
+        });
 
-  user.save().then((result) => {
-    res.json('ny användare sparad');
-  })
-    .catch((err) => { console.log(err) })
-
+        user.save().then((result) => {
+          console.log(result)
+          res.status(201).json(
+            { message: 'ny användare sparad' });
+        })
+          .catch((err) => { console.log(err) })
+      }
+    })
+    .catch()
 
 });
 
