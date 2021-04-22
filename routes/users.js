@@ -7,9 +7,6 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const randomKey = require('random-key');
 const CryptoJS = require('crypto-js');
-const { db } = require('../models/user');
-const { log } = require('debug');
-
 
 
 // Connecting to my mongodb
@@ -19,14 +16,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch((err) => console.log(err));
 
 
-/* GET users listing. */
-router.get('/', (req, res, next) => {
-
-
-
-  res.send('Hello users');
-});
-
+// Post router för ny user
 router.post('/new', (req, res, next) => {
 
   User.find({ userName: req.body.userEmail })
@@ -56,41 +46,48 @@ router.post('/new', (req, res, next) => {
       }
     })
     .catch((err) => console.log(err));
-
 });
 
-
+// Post router för login
 router.post('/login', (req, res, next) => {
   User.find({ userName: req.body.userEmail })
     .exec()
     .then(user => {
-      // console.log(userName);
-      // console.log(req.body.userEmail);
 
       if (user.length < 1) {
-        res.json({
+        return res.status(422).json({
           message: 'Fel användarnamn eller lösenord ifyllt'
         });
       }
       let originalPass = CryptoJS.AES.decrypt(user[0].userPassword, 'SecretKey123').toString(CryptoJS.enc.Utf8);
-      if (originalPass == req.body.userInputPassword) {
-        // res.json(user[0].id)
-        res.json('det lyckades')
+      if (originalPass == req.body.userInputPassword) { // Kan ändra req.body.userInputPassword till req.body.userPassword
+        res.status(200).json({
+          userId: user[0].id,
+          userName: user[0].userName,
+          subscription: user[0].subscription
+        })
       } else {
-        res.json({
-          message: 'Fel användarnamn eller lösenord IFYLLT'
+        res.status(422).json({
+          message: 'Fel användarnamn eller lösenord ifyllt'
         });
       }
-
-
-
     })
     .catch(err => {
       console.log(err);
       res.json('error');
     })
-
 });
+
+
+// router.get('/login', (req, res, next) => {
+
+//   res.json(data);
+
+
+
+// });
+
+
 
 
 module.exports = router;
