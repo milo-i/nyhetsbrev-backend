@@ -24,7 +24,7 @@ router.post('/new', (req, res, next) => {
     .then(user => {
       if (user.length >= 1) {
         res.status(422).json({
-          message: "Användare existerar redan"
+          message: 'Användare existerar redan'
         });
       } else {
         let userPass = req.body.userPassword;
@@ -39,8 +39,12 @@ router.post('/new', (req, res, next) => {
 
         user.save().then((result) => {
           console.log(result)
-          res.status(201).json(
-            { message: 'ny användare sparad' });
+          res.status(201).json({
+            message: 'ny användare sparad',
+            userId: result.id,
+            userName: result.userName,
+            subscription: result.subscription
+          });
         })
           .catch((err) => { console.log(err) })
       }
@@ -78,7 +82,7 @@ router.post('/login', (req, res, next) => {
     })
 });
 
-
+// Post router för ändring av prenumerationsstatus
 router.post('/sub', (req, res, next) => {
 
   User.findOne({ id: req.body.userId })
@@ -94,7 +98,6 @@ router.post('/sub', (req, res, next) => {
         user.save();
         res.status(200).json({ newSubscriptionChoice: user.subscription });
         console.log('Ändrad prenumerationsstatus');
-
       }
     })
     .catch(err => {
