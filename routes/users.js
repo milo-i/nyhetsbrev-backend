@@ -79,6 +79,31 @@ router.post('/login', (req, res, next) => {
 });
 
 
+router.post('/sub', (req, res, next) => {
+
+  User.findOne({ id: req.body.userId })
+    .exec()
+    .then(user => {
+
+      console.log(user);
+      console.log(req.body.newSubscriptionChoice);
+      console.log(user.subscription);
+      if (user.subscription != req.body.newSubscriptionChoice) {
+        user.subscription = req.body.newSubscriptionChoice
+
+        user.save();
+        res.status(200).json({ newSubscriptionChoice: user.subscription });
+        console.log('Ändrad prenumerationsstatus');
+
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.json('error');
+    })
+})
+
+
 // router.get('/login', (req, res, next) => {
 
 //   res.json(data);
