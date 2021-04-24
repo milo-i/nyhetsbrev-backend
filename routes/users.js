@@ -107,14 +107,45 @@ router.post('/sub', (req, res, next) => {
 })
 
 
-// router.get('/login', (req, res, next) => {
+let adminUser = { // Om tid finns, lägg in i en json fil
+  userName: 'admin',
+  userPassword: 'test'
+};
 
-//   res.json(data);
+router.post('/adminlogin', function (req, res, next) {
+
+  if (adminUser.userName == req.body.userName && adminUser.userPassword == req.body.password) {
+    console.log('success');
+    res.redirect('/users');
+
+  } else {
+    res.send('Fel användaruppgifter inmatade');
+  }
+});
+
+router.get('/', function (req, res, next) {
+
+  User.find({}, 'userName subscription', (err, data) => {
+
+    if (err) {
+      console.log(err);
+    } else {
+
+      console.log(data);
+
+      let printUsers = `<div><h2>Registerade användare</h2>`
+
+      for (user in data) {
+        printUsers += `<div>${data[user].userName} || ${data[user].subscription}</div>`
+      }
+
+      printUsers += `</div>`
 
 
-
-// });
-
+      res.send(printUsers);
+    }
+  })
+})
 
 
 
