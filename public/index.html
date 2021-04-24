@@ -6,8 +6,21 @@
 </head>
 
 <body>
-  <h1>Express</h1>
-  <p>Welcome to Express</p>
+  <h1>Adminsida</h1>
+
+  <form action="/users/adminlogin" method="post">
+
+    <label for="userName">Admin: </label>
+    <input type="text" id="userName" name="userName" placeholder="Admin" required>
+
+    <label for="password">Skriv in ditt lösenord: </label>
+    <input type="password" id="password" name="password" placeholder="Lösenord" required>
+
+    <button class="loginBtn" id="loginBtn">Logga in</button>
+  </form>
+
+
+
 </body>
 
 </html>
