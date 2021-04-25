@@ -20,7 +20,7 @@ I databasen finns två default users:
 
 User 1:
 
-username: john@doe.com,
+username: john@doe.com
 lösenord: test123
 
 User 2:
