@@ -8,13 +8,11 @@ const User = require('../models/user');
 const randomKey = require('random-key');
 const CryptoJS = require('crypto-js');
 
-
 // Connecting to my mongodb
 const dbURI = 'mongodb+srv://igor2021:igor2021@cluster0.hnt8d.mongodb.net/nyhetsbrev?retryWrites=true&w=majority';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => console.log('uppkopplad mot databasen')) // Kan behöva lägga in listen på servern istället för console.log så att man inte gör anrop innan db laddas
   .catch((err) => console.log(err));
-
 
 // Post router för ny user
 router.post('/new', (req, res, next) => {
@@ -46,7 +44,7 @@ router.post('/new', (req, res, next) => {
             subscription: result.subscription
           });
         })
-          .catch((err) => { console.log(err) })
+          .catch((err) => { console.log(err), res.json({ message: 'Vänligen fyll i alla fält för att registrera din email' }) });
       }
     })
     .catch((err) => console.log(err));
@@ -89,14 +87,14 @@ router.post('/sub', (req, res, next) => {
     .exec()
     .then(user => {
 
-      console.log(user);
-      console.log(req.body.newSubscriptionChoice);
-      console.log(user.subscription);
       if (user.subscription != req.body.newSubscriptionChoice) {
         user.subscription = req.body.newSubscriptionChoice
 
         user.save();
-        res.status(200).json({ newSubscriptionChoice: user.subscription });
+        res.status(200).json({
+          userName: user.userName,
+          newSubscriptionChoice: user.subscription
+        });
         console.log('Ändrad prenumerationsstatus');
       }
     })
